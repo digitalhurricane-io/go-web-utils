@@ -2,8 +2,6 @@ package json
 
 import (
 	"encoding/json"
-	"errors"
-	"log"
 	"net/http"
 )
 
@@ -27,11 +25,9 @@ func (rw JWriter) Status(statusCode int) JWriter {
 }
 
 // Send Must be called in order to send response
-func (rw JWriter) Send() error {
+func (rw JWriter) Send() {
 	if rw.statusCode == 0 {
-		err := errors.New("status code must be set before calling Send() by calling Status()")
-		log.Println(err)
-		return err
+		rw.statusCode = 200
 	}
 
 	var data = rw.json
@@ -44,14 +40,10 @@ func (rw JWriter) Send() error {
 
 	if data == nil {
 		// No response body
-		return nil
+		return
 	}
 
-	err := json.NewEncoder(rw.responseWriter).Encode(data)
-	if err != nil {
-		log.Println(err)
-	}
-	return err
+	json.NewEncoder(rw.responseWriter).Encode(data)
 }
 
 // Json The data to be encoded as json in the response
