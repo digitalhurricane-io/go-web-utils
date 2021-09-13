@@ -83,8 +83,9 @@ func (rw JWriter) Error(message string) JWriter {
 	return rw
 }
 
-// GenericError Set generic error message {"error": "An error occurred"}
-func (rw JWriter) GenericError() JWriter {
+// InternalError Set generic error message {"error": "An error occurred"}
+func (rw JWriter) InternalError() JWriter {
+	rw.statusCode = 500
 	rw.errorMessage = "An error occurred"
 	return rw
 }
