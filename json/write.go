@@ -3,10 +3,11 @@ package json
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
-// JWriter Easily send common json responses
-type JWriter struct {
+// JSender Easily send common json responses
+type JSender struct {
 	responseWriter 	http.ResponseWriter
 
 	statusCode 		int
@@ -19,14 +20,18 @@ type JWriter struct {
 }
 
 // Status Set the status code for response
-func (rw JWriter) Status(statusCode int) JWriter {
+func (rw JSender) Status(statusCode int) JSender {
 	rw.statusCode = statusCode
 	return rw
 }
 
 // Send Must be called in order to send response
-func (rw JWriter) Send() {
-	if rw.statusCode == 0 {
+func (rw JSender) Send() {
+
+	if rw.statusCode == 0 && rw.errorMessage != "" {
+		rw.statusCode = 400
+
+	} else if rw.statusCode == 0 {
 		rw.statusCode = 200
 	}
 
@@ -47,27 +52,27 @@ func (rw JWriter) Send() {
 }
 
 // Json The data to be encoded as json in the response
-func (rw JWriter) Json(data interface{}) JWriter {
+func (rw JSender) Json(data interface{}) JSender {
 	rw.json = data
 	return rw
 }
 
 // MissingParams 400 status {"error": "missing or invalid params"}
-func (rw JWriter) MissingParams() JWriter {
+func (rw JSender) MissingParams() JSender {
 	rw.statusCode = 400
 	rw.json = map[string]string{"error": "Missing or invalid params"}
 	return rw
 }
 
 // NotFound 404 status {"error": "Resource not found"}
-func (rw JWriter) NotFound() JWriter {
+func (rw JSender) NotFound() JSender {
 	rw.statusCode = 404
 	rw.json = map[string]string{"error": "Resource not found"}
 	return rw
 }
 
 // Success 200 status {"success": true}
-func (rw JWriter) Success() JWriter {
+func (rw JSender) Success() JSender {
 	if rw.statusCode == 0 {
 		rw.statusCode = 200
 	}
@@ -78,32 +83,42 @@ func (rw JWriter) Success() JWriter {
 }
 
 // Error Set custom error message {"error": message}
-func (rw JWriter) Error(message string) JWriter {
+// If no status code is set upon calling Send(), status code
+// will automatically be set to 500
+func (rw JSender) Error(message string) JSender {
 	rw.errorMessage = message
 	return rw
 }
 
+// Errorf Set custom formatted error message {"error": message}
+// If no status code is set upon calling Send(), status code
+// will automatically be set to 500
+func (rw JSender) Errorf(format string, a ...interface{}) JSender {
+	rw.errorMessage = fmt.Sprintf(format, a...)
+	return rw
+}
+
 // InternalError Set generic error message {"error": "An error occurred"}
-func (rw JWriter) InternalError() JWriter {
+func (rw JSender) InternalError() JSender {
 	rw.statusCode = 500
 	rw.errorMessage = "An error occurred"
 	return rw
 }
 
 // DBError 500 status. {"error": "DB Error"}
-func (rw JWriter) DBError() JWriter {
+func (rw JSender) DBError() JSender {
 	rw.statusCode = 500
 	rw.errorMessage = "DB Error"
 	return rw
 }
 
 // JsonParseError 400 status {"error": "JSON badly formatted"}
-func (rw JWriter) JsonParseError() JWriter {
+func (rw JSender) JsonParseError() JSender {
 	rw.errorMessage = "JSON badly formatted"
 	return rw
 }
 
-func Response(w http.ResponseWriter) JWriter {
+func Response(w http.ResponseWriter) JSender {
 	w.Header().Set("Content-Type", "application/json")
-	return JWriter{responseWriter: w}
+	return JSender{responseWriter: w}
 }
