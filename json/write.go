@@ -90,6 +90,13 @@ func (rw JWriter) InternalError() JWriter {
 	return rw
 }
 
+// DBError 500 status. {"error": "DB Error"}
+func (rw JWriter) DBError() JWriter {
+	rw.statusCode = 500
+	rw.errorMessage = "DB Error"
+	return rw
+}
+
 // JsonParseError 400 status {"error": "JSON badly formatted"}
 func (rw JWriter) JsonParseError() JWriter {
 	rw.errorMessage = "JSON badly formatted"
