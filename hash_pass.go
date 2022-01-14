@@ -2,7 +2,6 @@ package utils
 
 import (
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 func HashAndSalt(pwd string) (string, error) {
@@ -14,7 +13,6 @@ func HashAndSalt(pwd string) (string, error) {
 	// than the MinCost (4)
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	// GenerateFromPassword returns a byte slice so we need to

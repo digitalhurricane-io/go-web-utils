@@ -2,9 +2,7 @@ package utils
 
 import (
 	"fmt"
-	jutils "github.com/digitalhurricane-io/go-web-utils/json"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
 // WrapErr Wraps an error with formatted string. If the error is nil,
@@ -25,8 +23,8 @@ func WrapErr(err error, fmtString string, items ...interface{}) error {
 // in a http handler after returning from another function.
 type HttpError struct {
 	UserFacingMessage string
-	StatusCode int
-	Err error
+	StatusCode        int
+	Err               error
 }
 
 func (e HttpError) Error() string {
@@ -35,15 +33,6 @@ func (e HttpError) Error() string {
 		msg = e.Err.Error()
 	}
 	return msg
-}
-
-func (e HttpError) SendResponse(w http.ResponseWriter) {
-
-	if e.StatusCode == 0 {
-		e.StatusCode = http.StatusBadRequest
-	}
-
-	jutils.Response(w).Status(e.StatusCode).Error(e.UserFacingMessage).Send()
 }
 
 func (e HttpError) WithError(err error) HttpError {
@@ -60,4 +49,3 @@ func (e HttpError) WithStatus(statusCode int) HttpError {
 	e.StatusCode = statusCode
 	return e
 }
-
