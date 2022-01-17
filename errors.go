@@ -16,7 +16,7 @@ func WrapErr(err error, fmtString string, items ...interface{}) error {
 		return errors.Wrap(err, fmtString)
 	}
 
-	return errors.Wrap(err, fmt.Sprintf(fmtString, items))
+	return errors.Wrap(err, fmt.Sprintf(fmtString, items...))
 }
 
 // HttpError Simply makes it cleaner to send an error response back
