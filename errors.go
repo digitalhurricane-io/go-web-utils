@@ -27,7 +27,7 @@ type HttpError struct {
 	Err               error
 }
 
-func (e HttpError) Error() string {
+func (e *HttpError) Error() string {
 	var msg = e.UserFacingMessage
 	if msg == "" && e.Err != nil {
 		msg = e.Err.Error()
@@ -35,17 +35,21 @@ func (e HttpError) Error() string {
 	return msg
 }
 
-func (e HttpError) WithError(err error) HttpError {
+func (e *HttpError) WithError(err error) *HttpError {
 	e.Err = err
 	return e
 }
 
-func (e HttpError) WithMessage(msg string) HttpError {
+func (e *HttpError) WithMessage(msg string) *HttpError {
 	e.UserFacingMessage = msg
 	return e
 }
 
-func (e HttpError) WithStatus(statusCode int) HttpError {
+func (e *HttpError) WithStatus(statusCode int) *HttpError {
 	e.StatusCode = statusCode
 	return e
+}
+
+func (e *HttpError) Unwrap() error {
+	return e.Err
 }
